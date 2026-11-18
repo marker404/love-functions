@@ -1,0 +1,14 @@
+# 依赖 / 构建产物（本项目其实不需要，留着防止以后加工具链时误提交）
+node_modules/
+dist/
+build/
+
+# 系统 / 编辑器垃圾
+.DS_Store
+Thumbs.db
+desktop.ini
+.vscode/
+.idea/
+
+# 本地测试产物
+*.log

@@ -1,0 +1,120 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>LOVE · 函数拼字</title>
+<meta name="description" content="选函数、调参数：用反函数、圆、二次函数和竖起来的正弦函数，拼出 L O V E。">
+<meta name="color-scheme" content="light">
+<meta name="theme-color" content="#fbfafc">
+<link rel="icon" href="assets/favicon.svg" type="image/svg+xml">
+<link rel="stylesheet" href="assets/style.css">
+</head>
+<body>
+<div class="page">
+
+  <header class="bar">
+    <a class="brand" href="./" aria-label="LOVE 函数拼字">
+      <span class="brand-mark">LOVE</span>
+      <span class="brand-sub">函数拼字</span>
+    </a>
+    <nav class="steps" id="steps" aria-label="关卡"></nav>
+    <div class="bar-actions">
+      <button class="btn ghost" type="button" id="btnHelp">玩法</button>
+      <button class="btn ghost" type="button" id="btnReset">重置</button>
+    </div>
+  </header>
+
+  <main class="layout">
+
+    <section class="stage" id="stage">
+      <div class="stage-head">
+        <div class="level-info">
+          <span class="level-no" id="levelNo">01</span>
+          <div>
+            <h1 class="level-title"><span id="levelLetter">L</span><small id="levelTheme">反函数</small></h1>
+            <p class="level-desc" id="levelDesc"></p>
+          </div>
+        </div>
+        <div class="score" id="scoreBox">
+          <div class="score-num"><b id="scoreVal">0</b><span>%</span></div>
+          <div class="score-meta">
+            <div class="stars" id="stars" aria-label="匹配星级"><span>★</span><span>★</span><span>★</span></div>
+            <small>匹配度</small>
+          </div>
+        </div>
+      </div>
+
+      <div class="board-wrap" id="boardWrap">
+        <canvas id="board" aria-label="坐标画板：画出目标字母"></canvas>
+      </div>
+      <p class="tip" id="tip">从「函数库」挑一个函数开始</p>
+    </section>
+
+    <aside class="panel">
+      <section class="panel-block">
+        <h2 class="panel-title"><span>我的函数</span><span class="count" id="fnCount">0 / 5</span></h2>
+        <div class="fn-list" id="fnList"></div>
+      </section>
+
+      <section class="panel-block">
+        <h2 class="panel-title"><span>函数库</span><span class="count">点一下就添加</span></h2>
+        <div class="palette" id="palette"></div>
+      </section>
+
+      <section class="panel-block params-block" id="paramsBlock" hidden>
+        <h2 class="panel-title"><span>参数</span><span class="count" id="paramTitle"></span></h2>
+        <div class="params" id="params"></div>
+      </section>
+
+      <details class="panel-block hint" id="hintBox">
+        <summary>需要提示？点这里</summary>
+        <p id="hintText"></p>
+      </details>
+
+      <div class="cta" id="cta"></div>
+    </aside>
+
+  </main>
+
+  <footer class="foot">L 反函数 · O 圆 · V 二次函数 · E 正弦 · 四个字母，四种函数</footer>
+</div>
+
+<div class="toast" id="toast" role="status" aria-live="polite"></div>
+
+<div class="modal" id="helpModal" hidden>
+  <div class="modal-card" role="dialog" aria-modal="true" aria-labelledby="helpTitle">
+    <button class="modal-close" type="button" data-close="helpModal" aria-label="关闭">×</button>
+    <h2 id="helpTitle">怎么玩</h2>
+    <ol class="help-list">
+      <li>一共四关，目标是用函数曲线画出 <b>L</b>、<b>O</b>、<b>V</b>、<b>E</b> 四个字母。</li>
+      <li>从右侧「函数库」里挑函数，每次最多 5 个，可以叠加组合。</li>
+      <li>选中一个函数，拖动它的参数滑块，让<b>红色曲线</b>贴住<b>灰色虚线</b>。</li>
+      <li>匹配度 ≥ 66% 过关；82% 两星，92% 三星。过关后可以进入下一关。</li>
+      <li>四关都过了，会拼出完整的 LOVE，还能把这张图存下来。</li>
+    </ol>
+    <p class="help-note">每关都对应一类函数：L 是反函数、O 是圆、V 是二次函数、E 是竖起来的正弦。卡住了就点「需要提示？」。</p>
+    <button class="btn primary wide" type="button" data-close="helpModal">开始拼字</button>
+  </div>
+</div>
+
+<div class="modal" id="finaleModal" hidden>
+  <div class="modal-card finale-card" role="dialog" aria-modal="true" aria-labelledby="finaleTitle">
+    <button class="modal-close" type="button" data-close="finaleModal" aria-label="关闭">×</button>
+    <p class="finale-eyebrow" id="finaleEyebrow">四个字母，拼好了</p>
+    <h2 id="finaleTitle"><span>L</span><span>O</span><span>V</span><span>E</span></h2>
+    <div class="finale-board"><canvas id="finaleBoard"></canvas></div>
+    <p class="finale-note" id="finaleNote"></p>
+    <div class="finale-actions">
+      <button class="btn ghost" type="button" id="btnSaveLove">保存这份 LOVE</button>
+      <button class="btn primary" type="button" id="btnReplay">再玩一次</button>
+    </div>
+  </div>
+</div>
+
+<noscript><p style="text-align:center;padding:40px 20px;font-family:sans-serif">这个游戏需要开启 JavaScript 才能运行。</p></noscript>
+
+<script src="assets/scoring.js"></script>
+<script src="assets/game.js"></script>
+</body>
+</html>
