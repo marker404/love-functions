@@ -1,7 +1,9 @@
 # LOVE · 函数拼字
 
 > 选函数、调参数，用四条函数曲线拼出 **L · O · V · E** 的一个小游戏。
-> 纯 HTML/CSS/JavaScript，无框架、无构建、无依赖，双击 `index.html` 就能玩，也能直接放到 GitHub Pages 上。
+> 纯 HTML/CSS/JavaScript，无框架、无构建、无依赖，双击 `index.html` 就能玩。
+
+在线玩：<https://070712zz.com> ｜ 纯静态，直接放在 GitHub Pages 上
 
 ![游戏界面](docs/screenshot-level.png)
 
@@ -59,7 +61,7 @@ python -m http.server 8000
 ├─ docs/                    # README 用的截图
 ├─ tools/
 │  └─ check-scoring.js      # 打分算法冒烟测试（Node 运行，非必需）
-├─ CNAME.example            # 自定义域名的 CNAME 文件示例
+├─ CNAME                    # 自定义域名（070712zz.com）
 ├─ DEPLOY.md                # 部署到 GitHub Pages + 自己域名的完整教程
 ├─ LICENSE                  # MIT
 └─ README.md
@@ -67,12 +69,18 @@ python -m http.server 8000
 
 ## 部署
 
-完整步骤（含自定义域名、DNS 记录、HTTPS、常见问题）见 **[DEPLOY.md](DEPLOY.md)**，大致是：
+已经部署在 **<https://070712zz.com>**（GitHub Pages + 自定义域名 + HTTPS）。
+从零部署、换域名、DNS 记录、HTTPS 证书的完整步骤见 **[DEPLOY.md](DEPLOY.md)**。
 
-1. 把仓库推到 GitHub，`Settings → Pages → Deploy from a branch → main / (root)`；
-2. 在 `Settings → Pages → Custom domain` 填你的域名；
-3. 按 DEPLOY.md 里的表格在域名服务商添加 `CNAME`（子域名）或 `A / AAAA`（根域名）记录；
-4. 等证书签发后勾选 `Enforce HTTPS`。
+日常更新：
+
+```powershell
+git add -A
+git commit -m "update: 说明改了什么"
+git push
+```
+
+推送后 1～2 分钟自动上线，浏览器 `Ctrl + F5` 强刷即可。
 
 > 纯静态站点，不需要服务器、数据库或后端。
 
