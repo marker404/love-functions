@@ -128,13 +128,10 @@
     {
       letter: 'E',
       theme: '正弦函数竖起来',
-      desc: '竖起来的正弦，三个波峰就是 E 的三条横臂。',
-      hint: '先加一条「竖直线」当脊柱（x ≈ −2）；再加「正弦·竖」x = A·sin(ω(y−v)) + h：A ≈ 2、ω ≈ 2.95、h ≈ 0、v ≈ 3.73，三条横臂就朝右张开了。',
-      bbox: { x0: -2.1, x1: 2.1, y0: -3.25, y1: 3.25 },
-      target: [
-        { type: 'vline', p: { c: -2 } },
-        { type: 'sineV', p: { A: 2, w: 2.95, h: 0, v: 3.73 } }
-      ]
+      desc: '把竖起来的正弦反过来：三个朝右的波峰，就是 E 的三条横臂。',
+      hint: '添加「正弦·竖」x = A·sin(ω(y−v)) + h：A ≈ 2.2、ω ≈ 1.93、h ≈ 0、v ≈ 2.45，曲线自己就张开成 E 的样子，不用再加竖线。',
+      bbox: { x0: -2.3, x1: 2.3, y0: -3.3, y1: 3.3 },
+      target: [{ type: 'sineV', p: { A: 2.2, w: 1.93, h: 0, v: 2.45 } }]
     }
   ];
 
@@ -923,7 +920,6 @@
     if (!modal) return;
     modal.hidden = false;
     document.body.classList.add('modal-open');
-    if (id === 'finaleModal') renderFinale();
   }
 
   function closeModal(id) {
@@ -934,6 +930,7 @@
       state.helpSeen = true;
       saveSoon();
     }
+    if (id === 'finaleModal') stopFinale();
     var help = document.getElementById('helpModal');
     var finale = document.getElementById('finaleModal');
     if (help && help.hidden && finale && finale.hidden) {
@@ -941,103 +938,294 @@
     }
   }
 
+  // ============================================================
+  // 通关 LOVE：逐笔画出来 + 小动画
+  // ============================================================
+
+  var FINALE = {
+    raf: 0,
+    running: false,
+    start: 0,
+    time: 0,
+    letters: null,
+    hearts: null,
+    tagline: 'made of functions, deployed with love',
+    timing: {
+      stagger: 430,
+      draw: 900,
+      taglineStart: 2360,
+      taglineFade: 760,
+      heartsStart: 2200
+    }
+  };
+
   function openFinale() {
-    renderFinale();
     openModal('finaleModal');
+    buildFinaleLetters();
+    updateFinaleNote();
+    renderFinaleFrame(0);
+    startFinale();
   }
 
-  function renderFinale() {
-    var canvas = document.getElementById('finaleBoard');
-    if (!canvas) return;
-    var host = canvas.parentNode;
-    var cssW = Math.max(280, Math.floor((host && host.clientWidth) || 720));
-    var cssH = Math.max(120, Math.round(cssW * 0.34));
-    var dpr = Math.min(2, window.devicePixelRatio || 1);
-
-    canvas.width = Math.round(cssW * dpr);
-    canvas.height = Math.round(cssH * dpr);
-    canvas.style.width = cssW + 'px';
-    canvas.style.height = cssH + 'px';
-
-    var c = canvas.getContext('2d');
-    c.setTransform(dpr, 0, 0, dpr, 0, 0);
-    c.fillStyle = '#fbfafc';
-    c.fillRect(0, 0, cssW, cssH);
-
-    var slotW = cssW / LEVELS.length;
-    var pad = Math.max(8, cssW * 0.018);
-    var labelH = Math.max(16, cssH * 0.12);
-    var artH = cssH - labelH;
-    // 四个字母统一高度，像排版一样对齐
-    var commonH = Math.max(40, Math.min(artH - pad * 2, slotW - pad * 2));
-
-    LEVELS.forEach(function (lv, i) {
+  function buildFinaleLetters() {
+    FINALE.letters = LEVELS.map(function (lv, i) {
       var record = state.levels[i];
       var curves = (record && record.bestCurves && record.bestCurves.length)
         ? record.bestCurves
         : lv.target;
-      drawLetterInSlot(c, curves, lv.bbox, i * slotW, 0, slotW, artH, pad, commonH);
-
-      c.fillStyle = '#c4ccd9';
-      c.font = Math.round(Math.max(9, Math.min(12, slotW * 0.055))) + 'px "Segoe UI", "PingFang SC", sans-serif';
-      c.textAlign = 'center';
-      c.textBaseline = 'middle';
-      c.fillText(lv.theme, i * slotW + slotW / 2, artH + labelH / 2 - 1);
+      var polylines = curves.map(sampleCurve);
+      var total = 0;
+      for (var k = 0; k < polylines.length; k++) total += polylines[k].length;
+      return { theme: lv.theme, bbox: lv.bbox, polylines: polylines, total: total };
     });
 
-    var note = document.getElementById('finaleNote');
-    if (note) {
-      var totalStars = 0;
-      state.levels.forEach(function (rec) { totalStars += starsFor(rec.best); });
-      note.textContent = 'L 反函数 · O 圆 · V 二次函数 · E 竖起来的正弦 —— ' +
-        state.levels.length + ' 个字母 · ' + totalStars + ' / ' + (LEVELS.length * 3) + ' 星';
+    FINALE.hearts = [];
+    for (var j = 0; j < 14; j++) {
+      FINALE.hearts.push({
+        x: Math.random(),
+        offset: Math.random() * 900,
+        speed: 10 + Math.random() * 22,
+        size: 7 + Math.random() * 7,
+        alpha: 0.05 + Math.random() * 0.10,
+        wobble: 0.6 + Math.random() * 1.2,
+        phase: Math.random() * Math.PI * 2
+      });
     }
   }
 
-  function drawLetterInSlot(c, curves, bbox, x, y, w, h, pad, commonH) {
-    var bw = bbox.x1 - bbox.x0;
-    var bh = bbox.y1 - bbox.y0;
-    var scale = Math.min((w - pad * 2) / bw, (h - pad * 2) / bh);
-    if (commonH) scale = Math.min((w - pad * 2) / bw, commonH / bh);
-    if (!isFinite(scale) || scale <= 0) return;
-    var cx = x + w / 2;
-    var cy = y + h / 2;
+  function updateFinaleNote() {
+    var note = document.getElementById('finaleNote');
+    if (!note) return;
+    var totalStars = 0;
+    state.levels.forEach(function (rec) { totalStars += starsFor(rec.best); });
+    note.textContent = 'L 反函数 · O 圆 · V 二次函数 · E 正弦 —— ' +
+      totalStars + ' / ' + (LEVELS.length * 3) + ' 星';
+  }
+
+  function startFinale() {
+    stopFinale();
+    var reduced = false;
+    try {
+      reduced = !!(window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches);
+    } catch (e) {
+      reduced = false;
+    }
+    if (reduced) {
+      renderFinaleFrame(1e9);
+      return;
+    }
+    FINALE.running = true;
+    FINALE.start = (window.performance && window.performance.now)
+      ? window.performance.now()
+      : Date.now();
+    var tick = function (now) {
+      if (!FINALE.running) return;
+      FINALE.time = now - FINALE.start;
+      renderFinaleFrame(FINALE.time);
+      FINALE.raf = window.requestAnimationFrame(tick);
+    };
+    FINALE.raf = window.requestAnimationFrame(tick);
+  }
+
+  function stopFinale() {
+    FINALE.running = false;
+    if (FINALE.raf) {
+      window.cancelAnimationFrame(FINALE.raf);
+      FINALE.raf = 0;
+    }
+  }
+
+  function renderFinaleFrame(t) {
+    var canvas = document.getElementById('finaleBoard');
+    if (!canvas) return;
+    if (!FINALE.letters) buildFinaleLetters();
+
+    var host = canvas.parentNode;
+    var cssW = Math.max(280, Math.floor((host && host.clientWidth) || 720));
+    var cssH = Math.max(150, Math.round(cssW * 0.36));
+    var dpr = Math.min(2, window.devicePixelRatio || 1);
+    var pxW = Math.round(cssW * dpr);
+    var pxH = Math.round(cssH * dpr);
+
+    if (canvas.width !== pxW || canvas.height !== pxH) {
+      canvas.width = pxW;
+      canvas.height = pxH;
+      canvas.style.width = cssW + 'px';
+      canvas.style.height = cssH + 'px';
+    }
+
+    var c = canvas.getContext('2d');
+    c.setTransform(dpr, 0, 0, dpr, 0, 0);
+    drawFinale(c, cssW, cssH, t);
+  }
+
+  function drawFinale(c, w, h, t) {
+    c.clearRect(0, 0, w, h);
+    c.fillStyle = '#fbfafc';
+    c.fillRect(0, 0, w, h);
+
+    var letters = FINALE.letters || [];
+    var timing = FINALE.timing;
+    var slotW = w / LEVELS.length;
+    var pad = Math.max(8, w * 0.018);
+    var artTop = Math.round(h * 0.03);
+    var artH = Math.round(h * 0.66);
+    var artCy = artTop + artH / 2;
+    var labelY = artTop + artH + Math.round(h * 0.05);
+    var taglineY = Math.round(h * 0.905);
+    // 四个字母统一高度，像排版一样对齐
+    var commonH = Math.max(40, Math.min(artH - pad * 2, slotW - pad * 2));
+
+    // 背景里慢慢飘起来的小爱心
+    drawFinaleHearts(c, w, h, t);
+
+    var easeOut = function (v) { return 1 - Math.pow(1 - v, 3); };
+
+    for (var i = 0; i < letters.length; i++) {
+      var lt = letters[i];
+      var raw = (t - i * timing.stagger) / timing.draw;
+      var progress = raw <= 0 ? 0 : (raw >= 1 ? 1 : easeOut(raw));
+
+      var bw = lt.bbox.x1 - lt.bbox.x0;
+      var bh = lt.bbox.y1 - lt.bbox.y0;
+      var scale = Math.min((slotW - pad * 2) / bw, commonH / bh);
+      if (!isFinite(scale) || scale <= 0) continue;
+
+      var cx = i * slotW + slotW / 2;
+      var cy = artCy;
+      var worldCx = lt.bbox.x0 + bw / 2;
+      var worldCy = lt.bbox.y0 + bh / 2;
+
+      // 已经画出来的部分（按采样点顺序逐笔出现）
+      var budget = Math.round(progress * lt.total);
+      var penX = 0;
+      var penY = 0;
+      var penOn = false;
+
+      c.save();
+      c.translate(cx, cy);
+      c.scale(scale, -scale);
+      c.translate(-worldCx, -worldCy);
+      c.beginPath();
+      c.rect(lt.bbox.x0, lt.bbox.y0, bw, bh);
+      c.clip();
+      c.lineCap = 'round';
+      c.lineJoin = 'round';
+      c.strokeStyle = '#e11d48';
+      c.lineWidth = 5.2 / scale;
+      c.shadowColor = 'rgba(225, 29, 72, 0.18)';
+      c.shadowBlur = 10 / scale;
+
+      for (var k = 0; k < lt.polylines.length && budget > 0; k++) {
+        var pts = lt.polylines[k];
+        var n = Math.min(pts.length, budget);
+        if (n > 1) {
+          c.beginPath();
+          c.moveTo(pts[0][0], pts[0][1]);
+          for (var m = 1; m < n; m++) c.lineTo(pts[m][0], pts[m][1]);
+          c.stroke();
+          penX = pts[n - 1][0];
+          penY = pts[n - 1][1];
+          penOn = true;
+        }
+        budget -= n;
+      }
+      c.restore();
+
+      // 正在画的位置点一颗小圆点，像笔尖
+      if (penOn && progress > 0 && progress < 1) {
+        var dotX = cx + (penX - worldCx) * scale;
+        var dotY = cy - (penY - worldCy) * scale;
+        c.save();
+        c.shadowColor = 'rgba(225, 29, 72, 0.5)';
+        c.shadowBlur = 8;
+        c.fillStyle = '#e11d48';
+        c.beginPath();
+        c.arc(dotX, dotY, 3.6, 0, Math.PI * 2);
+        c.fill();
+        c.restore();
+      }
+
+      // 字母下面的小字
+      var labelAlpha = Math.max(0, Math.min(1, (t - (i * timing.stagger + timing.draw)) / 420));
+      if (labelAlpha > 0) {
+        c.globalAlpha = labelAlpha * 0.9;
+        c.fillStyle = '#c4ccd9';
+        c.font = Math.round(Math.max(9, Math.min(12, slotW * 0.052))) +
+          'px "Segoe UI", "PingFang SC", sans-serif';
+        c.textAlign = 'center';
+        c.textBaseline = 'middle';
+        c.fillText(lt.theme, cx, labelY);
+        c.globalAlpha = 1;
+      }
+    }
+
+    // 收尾那句话
+    var tagAlpha = Math.max(0, Math.min(1, (t - timing.taglineStart) / timing.taglineFade));
+    if (tagAlpha > 0) drawFinaleTagline(c, w, taglineY, tagAlpha, t);
+  }
+
+  function drawFinaleHearts(c, w, h, t) {
+    if (!FINALE.hearts) return;
+    var elapsed = Math.max(0, (t - FINALE.timing.heartsStart) / 1000);
+    if (elapsed <= 0) return;
+    var fade = Math.min(1, elapsed / 1.2);
 
     c.save();
-    c.translate(cx, cy);
-    c.scale(scale, -scale);
-    c.translate(-(bbox.x0 + bw / 2), -(bbox.y0 + bh / 2));
-    c.beginPath();
-    c.rect(bbox.x0, bbox.y0, bw, bh);
-    c.clip();
-    c.lineCap = 'round';
-    c.lineJoin = 'round';
-    c.strokeStyle = '#e11d48';
-    c.lineWidth = 5.4 / scale;
-    c.shadowColor = 'rgba(225, 29, 72, 0.18)';
-    c.shadowBlur = 10 / scale;
-
-    var list = curves.map(sampleCurve);
-    var s = scale;
-    for (var k = 0; k < list.length; k++) {
-      var pts = list[k];
-      c.beginPath();
-      for (var i = 0; i < pts.length; i++) {
-        var px = pts[i][0];
-        var py = pts[i][1];
-        if (i === 0) c.moveTo(px, py);
-        else c.lineTo(px, py);
-      }
-      c.stroke();
+    c.textAlign = 'center';
+    c.textBaseline = 'middle';
+    c.fillStyle = '#e11d48';
+    for (var i = 0; i < FINALE.hearts.length; i++) {
+      var p = FINALE.hearts[i];
+      var y = h + 30 - ((p.offset + p.speed * elapsed) % (h + 60));
+      var x = p.x * w + Math.sin(elapsed * p.wobble + p.phase) * 14;
+      c.globalAlpha = p.alpha * fade;
+      c.font = Math.round(p.size) + 'px Georgia, "Times New Roman", serif';
+      c.fillText('♥', x, y);
     }
     c.restore();
   }
 
+  function drawFinaleTagline(c, w, y, alpha, t) {
+    var text = FINALE.tagline;
+    var fontSize = Math.round(Math.max(11, Math.min(16, w * 0.019)));
+    c.save();
+    c.globalAlpha = alpha;
+    c.font = 'italic ' + fontSize + 'px Georgia, "Times New Roman", "Songti SC", serif';
+    c.textBaseline = 'middle';
+    c.textAlign = 'left';
+
+    var tw = 0;
+    try { tw = c.measureText(text).width; } catch (e) { tw = text.length * fontSize * 0.52; }
+    var heartSize = fontSize + 2;
+    var gap = Math.round(fontSize * 0.6);
+    var totalW = tw + gap + heartSize;
+    var x0 = Math.max(10, (w - totalW) / 2);
+
+    c.fillStyle = '#a9b1bd';
+    c.fillText(text, x0, y);
+
+    var pulse = 0.62 + 0.38 * Math.sin(t / 380);
+    c.globalAlpha = alpha * pulse;
+    c.fillStyle = '#e11d48';
+    c.font = heartSize + 'px Georgia, "Times New Roman", serif';
+    c.fillText('♥', x0 + tw + gap, y + 0.5);
+    c.restore();
+  }
+
   function saveLoveImage() {
-    var canvas = document.getElementById('finaleBoard');
-    if (!canvas) return;
     try {
-      var url = canvas.toDataURL('image/png');
+      if (!FINALE.letters) buildFinaleLetters();
+      var W = 1600;
+      var H = Math.round(W * 0.36);
+      var off = document.createElement('canvas');
+      off.width = W;
+      off.height = H;
+      var c = off.getContext('2d');
+      // 传一个很大的 t：字母和那句话都画完，只留下飘着的爱心
+      drawFinale(c, W, H, 1e9);
+
+      var url = off.toDataURL('image/png');
       var a = document.createElement('a');
       a.href = url;
       a.download = 'LOVE-functions.png';
@@ -1049,6 +1237,7 @@
       showToast('保存失败，可以试试截图或右键另存');
     }
   }
+
 
   // ============================================================
   // 重置
@@ -1109,7 +1298,7 @@
 
     window.addEventListener('resize', function () {
       var finale = document.getElementById('finaleModal');
-      if (finale && finale.hidden === false) renderFinale();
+      if (finale && finale.hidden === false) renderFinaleFrame(FINALE.time);
     });
   }
 

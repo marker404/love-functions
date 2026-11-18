@@ -486,10 +486,22 @@ details.hint p { margin: 10px 0 0; font-size: 12.5px; line-height: 1.75; color: 
 
 .foot {
   padding: 22px 0 4px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
   text-align: center;
   font-size: 11.5px;
   color: var(--muted-2);
   letter-spacing: .06em;
+}
+
+.foot-love {
+  font-family: var(--serif);
+  font-style: italic;
+  font-size: 12px;
+  letter-spacing: .02em;
+  color: #b9aeb5;
 }
 
 /* ---------- 提示气泡 ---------- */

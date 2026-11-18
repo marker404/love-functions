@@ -75,15 +75,9 @@ const LEVELS = [
   },
   {
     name: 'E 正弦竖起来',
-    bbox: { x0: -2.1, x1: 2.1, y0: -3.25, y1: 3.25 },
-    target: [
-      { type: 'vline', p: { c: -2 } },
-      { type: 'sineV', p: { A: 2, w: 2.95, h: 0, v: 3.73 } }
-    ],
-    near: [
-      { type: 'vline', p: { c: -1.95 } },
-      { type: 'sineV', p: { A: 1.95, w: 2.9, h: 0.05, v: 3.7 } }
-    ]
+    bbox: { x0: -2.3, x1: 2.3, y0: -3.3, y1: 3.3 },
+    target: [{ type: 'sineV', p: { A: 2.2, w: 1.93, h: 0, v: 2.45 } }],
+    near: [{ type: 'sineV', p: { A: 2.25, w: 1.95, h: 0.05, v: 2.4 } }]
   }
 ];
 
