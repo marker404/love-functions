@@ -274,6 +274,7 @@
   var saveTimer = null;
   var toastTimer = null;
   var scorePending = false;
+  var lastScore = 0;
 
   function freshState() {
     return {
@@ -591,6 +592,7 @@
   // ============================================================
 
   function renderScoreUI(score) {
+    lastScore = score;
     var pct = Math.round(score * 100);
     if (scoreVal) scoreVal.textContent = String(pct);
     var n = starsFor(score);
@@ -600,6 +602,12 @@
     if (scoreBox) scoreBox.classList.toggle('passed', score >= PASS);
     if (scoreVal && scoreVal.parentNode) {
       scoreVal.parentNode.parentNode.classList.toggle('passed', score >= PASS);
+    }
+    // 底部参数面板上的实时匹配度（手机上调参时不用抬头看）
+    var dockScore = document.getElementById('paramScore');
+    if (dockScore) {
+      dockScore.textContent = '匹配度 ' + pct + '%';
+      dockScore.classList.toggle('hot', score >= PASS);
     }
   }
 
@@ -729,11 +737,20 @@
     if (!curve) {
       block.hidden = true;
       host.innerHTML = '';
+      setDock(false);
       return;
     }
     block.hidden = false;
+    setDock(true);
     var type = TYPES[curve.type];
     if (title) title.textContent = type.name;
+
+    var dockScore = document.getElementById('paramScore');
+    if (dockScore) {
+      var pct = Math.round(lastScore * 100);
+      dockScore.textContent = '匹配度 ' + pct + '%';
+      dockScore.classList.toggle('hot', lastScore >= PASS);
+    }
 
     host.innerHTML = '';
     type.params.forEach(function (pd) {
@@ -755,6 +772,7 @@
       input.step = String(pd.step);
       input.value = String(curve.p[pd.key]);
       input.setAttribute('aria-label', pd.label);
+      updateSliderFill(input, curve.p[pd.key], pd);
 
       var out = document.createElement('output');
       out.textContent = fmt(curve.p[pd.key]);
@@ -764,6 +782,7 @@
         if (!isFinite(v)) return;
         curve.p[pd.key] = v;
         out.textContent = fmt(v);
+        updateSliderFill(input, v, pd);
         updateChipEquations();
         draw();
         scheduleScore();
@@ -775,6 +794,30 @@
       row.appendChild(out);
       host.appendChild(row);
     });
+  }
+
+  function setDock(open) {
+    if (document.body) document.body.classList.toggle('dock-open', !!open);
+  }
+
+  function updateSliderFill(input, value, pd) {
+    var span = pd.max - pd.min;
+    var pct = span > 0 ? ((value - pd.min) / span) * 100 : 0;
+    input.style.setProperty('--fill', clamp(pct, 0, 100) + '%');
+  }
+
+  function isMobileLayout() {
+    try { return window.matchMedia('(max-width: 980px)').matches; }
+    catch (e) { return window.innerWidth <= 980; }
+  }
+
+  // 手机上点了函数/切了函数后，把画布滚回视野里，免得只有滑块看不到图
+  function bringStageIntoView() {
+    if (!isMobileLayout()) return;
+    var stage = document.getElementById('stage');
+    if (!stage || !stage.scrollIntoView) return;
+    try { stage.scrollIntoView({ behavior: 'smooth', block: 'start' }); }
+    catch (e) { window.scrollTo(0, 0); }
   }
 
   function renderCta() {
@@ -854,6 +897,7 @@
     draw();
     scheduleScore();
     persistCurves();
+    bringStageIntoView();
     showToast('已添加「' + type.name + '」');
   }
 
@@ -874,6 +918,7 @@
     state.selected = index;
     renderFnList();
     renderParams();
+    bringStageIntoView();
   }
 
   function goLevel(index) {
