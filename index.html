@@ -3,124 +3,138 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<title>你猜这是什么</title>
-<meta name="description" content="选函数、调参数：用反函数、圆、二次函数和竖起来的正弦函数，拼出 L O V E。">
+<title>070712 · 小站</title>
+<meta name="description" content="一个专门写给你的的小站，想到啥就写啥">
 <meta name="color-scheme" content="light">
 <meta name="theme-color" content="#fbfafc">
 <link rel="icon" href="assets/favicon.svg" type="image/svg+xml">
-<link rel="stylesheet" href="assets/style.css">
+<link rel="stylesheet" href="assets/home.css">
 </head>
 <body>
-<div class="page">
+<div class="site">
 
-  <header class="bar">
-    <a class="brand" href="./" aria-label="LOVE 函数拼字">
-      <span class="brand-mark">LOVE</span>
-      <span class="brand-sub">函数拼字</span>
+  <header class="site-head">
+    <a class="brand" href="./">
+      <span class="brand-mark">070712</span>
+      <span class="brand-sub">小站</span>
     </a>
-    <nav class="steps" id="steps" aria-label="关卡"></nav>
-    <div class="bar-actions">
-      <button class="btn ghost" type="button" id="btnHelp">玩法</button>
-      <button class="btn ghost" type="button" id="btnReset">重置</button>
-    </div>
+    <nav class="nav" aria-label="导航">
+      <a href="#works">作品</a>
+      <a href="#about">关于</a>
+      <a href="https://github.com/marker404/love-functions" target="_blank" rel="noopener">GitHub</a>
+    </nav>
   </header>
 
-  <main class="layout">
+  <main>
 
-    <section class="stage" id="stage">
-      <div class="stage-head">
-        <div class="level-info">
-          <span class="level-no" id="levelNo">01</span>
-          <div>
-            <h1 class="level-title"><span id="levelLetter">L</span><small id="levelTheme">反函数</small></h1>
-            <p class="level-desc" id="levelDesc"></p>
-          </div>
-        </div>
-        <div class="score" id="scoreBox">
-          <div class="score-num"><b id="scoreVal">0</b><span>%</span></div>
-          <div class="score-meta">
-            <div class="stars" id="stars" aria-label="匹配星级"><span>★</span><span>★</span><span>★</span></div>
-            <small>匹配度</small>
-          </div>
+    <section class="hero">
+      <div class="hero-copy">
+        <p class="eyebrow">070712zz.com</p>
+        <h1>做些小东西，<br><em>玩玩。</em></h1>
+        <p class="hero-sub">oo，写给谁的好难猜呀</p>
+        <div class="hero-actions">
+          <a class="btn primary" href="#works">看看作品</a>
+          <a class="btn ghost" href="#about">关于小站</a>
         </div>
       </div>
-
-      <div class="board-wrap" id="boardWrap">
-        <canvas id="board" aria-label="坐标画板：画出目标字母"></canvas>
+      <div class="hero-art">
+        <canvas id="heroCanvas" width="520" height="380" aria-label="用函数曲线依次写出 LOVE 四个字母的动画"></canvas>
       </div>
-      <p class="tip" id="tip">从「函数库」挑一个函数开始</p>
     </section>
 
-    <aside class="panel">
-      <section class="panel-block">
-        <h2 class="panel-title"><span>我的函数</span><span class="count" id="fnCount">0 / 5</span></h2>
-        <div class="fn-list" id="fnList"></div>
-      </section>
+    <section class="works" id="works">
+      <div class="section-head">
+        <h2><span class="dot"></span>作品</h2>
+        <p>每个小玩意都有自己的链接，点进去就能玩。</p>
+      </div>
+      <div class="cards">
 
-      <section class="panel-block">
-        <h2 class="panel-title"><span>函数库</span><span class="count">点一下就添加</span></h2>
-        <div class="palette" id="palette"></div>
-      </section>
+        <a class="card reveal" href="love-functions/">
+          <div class="card-preview">
+            <img src="assets/preview-love.png" alt="LOVE 函数拼字的通关画面：L、O、V、E 四个字母由函数曲线画成" loading="lazy">
+          </div>
+          <div class="card-body">
+            <div class="card-meta">
+              <span class="badge live">已上线</span>
+              <span class="card-url">/love-functions/</span>
+            </div>
+            <h3>LOVE · 函数拼字</h3>
+            <p>选函数、调参数，用反函数、圆、二次函数和竖起来的正弦拼出 LOVE。</p>
+          </div>
+        </a>
 
-      <section class="panel-block params-block" id="paramsBlock" hidden>
-        <h2 class="panel-title">
-          <span>参数 · <b class="dock-fn" id="paramTitle"></b></span>
-          <span class="dock-score" id="paramScore">匹配度 0%</span>
-        </h2>
-        <div class="params" id="params"></div>
-      </section>
+        <div class="card is-soon reveal">
+          <div class="card-preview hug-preview">
+            <svg viewBox="0 0 300 170" role="img" aria-label="两个抱在一起的小人，头顶有一颗心">
+              <g class="hug-fig hug-left">
+                <circle cx="118" cy="58" r="17" fill="#f1c3a3"/>
+                <path d="M111 57q3.2 3.2 6.4 0M119 57q3.2 3.2 6.4 0" fill="none" stroke="#a97a5c" stroke-width="2" stroke-linecap="round"/>
+                <path d="M114.5 65.5q3.5 3.6 7 0" fill="none" stroke="#a97a5c" stroke-width="2" stroke-linecap="round"/>
+                <path d="M88 96q0-20 30-20t30 20v36q0 12-12 12H100q-12 0-12-12z" fill="#f8dcc8"/>
+                <path d="M92 112q16 12 40 8" fill="none" stroke="#f1c3a3" stroke-width="11" stroke-linecap="round"/>
+              </g>
+              <g class="hug-fig hug-right">
+                <circle cx="182" cy="58" r="17" fill="#eab08c"/>
+                <path d="M175 57q3.2 3.2 6.4 0M183 57q3.2 3.2 6.4 0" fill="none" stroke="#9c6b4e" stroke-width="2" stroke-linecap="round"/>
+                <path d="M178.5 65.5q3.5 3.6 7 0" fill="none" stroke="#9c6b4e" stroke-width="2" stroke-linecap="round"/>
+                <path d="M152 96q0-20 30-20t30 20v36q0 12-12 12h-36q-12 0-12-12z" fill="#f4cbb4"/>
+                <path d="M208 112q-16 12-40 8" fill="none" stroke="#eab08c" stroke-width="11" stroke-linecap="round"/>
+              </g>
+              <path class="hug-heart" d="M150 26c-5-9-18-9-21 1-3 10 9 18 21 26 12-8 24-16 21-26-3-10-16-10-21-1z" fill="#e11d48"/>
+            </svg>
+          </div>
+          <div class="card-body">
+            <div class="card-meta">
+              <span class="badge soon">筹备中</span>
+              <span class="card-url">/hug/</span>
+            </div>
+            <h3>抱抱小屋</h3>
+            <p>没想好做成啥样呢还</p>
+          </div>
+        </div>
 
-      <details class="panel-block hint" id="hintBox">
-        <summary>需要提示？点这里</summary>
-        <p id="hintText"></p>
-      </details>
+        <div class="card is-soon placeholder reveal">
+          <div class="card-preview placeholder-preview">
+            <span class="plus">+</span>
+            <small>位置留着</small>
+          </div>
+          <div class="card-body">
+            <div class="card-meta">
+              <span class="badge none">待定</span>
+              <span class="card-url">/…/</span>
+            </div>
+            <h3>再放点什么</h3>
+            <p>下一个小玩意还没想好，想到就更。</p>
+          </div>
+        </div>
 
-      <div class="cta" id="cta"></div>
-    </aside>
+      </div>
+    </section>
+
+    <section class="about" id="about">
+      <div class="about-card reveal">
+        <h2>关于小站</h2>
+        <p>想要在互联网上给你一个属于你自己的小角落</p>
+        <ul class="facts">
+          <li><span>域名</span><b>070712zz.com</b></li>
+          <li><span>技术</span><b>DeepSeek</b></li>
+          <li><span>部署</span><b>GitHub Pages</b></li>
+          <li><span>更新</span><b>想到就更</b></li>
+        </ul>
+      </div>
+    </section>
 
   </main>
 
-  <footer class="foot">
-    <span>v0.0.1</span>
-    <span class="foot-love">made of functions, deployed with love</span>
+  <footer class="site-foot">
+    <p class="foot-love">made of functions, deployed with love</p>
+    <p class="foot-meta">© <span id="year">2026</span> · 070712zz.com · <a href="https://github.com/marker404/love-functions" target="_blank" rel="noopener">GitHub</a></p>
   </footer>
+
 </div>
 
-<div class="toast" id="toast" role="status" aria-live="polite"></div>
+<noscript><p style="text-align:center;padding:40px 20px">首页的入场动画需要开启 JavaScript，作品链接仍然可以直接点。</p></noscript>
 
-<div class="modal" id="helpModal" hidden>
-  <div class="modal-card" role="dialog" aria-modal="true" aria-labelledby="helpTitle">
-    <button class="modal-close" type="button" data-close="helpModal" aria-label="关闭">×</button>
-    <h2 id="helpTitle">怎么玩</h2>
-    <ol class="help-list">
-      <li>一共四关，目标是用函数曲线画出 <b>L</b>、<b>O</b>、<b>V</b>、<b>E</b> 四个字母。</li>
-      <li>从右侧「函数库」里挑函数，每次最多 5 个，可以叠加组合。</li>
-      <li>选中一个函数，拖动它的参数滑块，让<b>红色曲线</b>贴住<b>灰色虚线</b>。手机上参数面板会吸在屏幕底部，拖滑块时上面的图形一直看得见。</li>
-      <li>匹配度 ≥ 66% 过关；82% 两星，92% 三星。过关后可以进入下一关。</li>
-      <li>四关都过了，会拼出完整的 LOVE</li>
-    </ol>
-    <p class="help-note">每关都对应一类函数，卡住了就点「需要提示？」。</p>
-    <button class="btn primary wide" type="button" data-close="helpModal">开始拼字</button>
-  </div>
-</div>
-
-<div class="modal" id="finaleModal" hidden>
-  <div class="modal-card finale-card" role="dialog" aria-modal="true" aria-labelledby="finaleTitle">
-    <button class="modal-close" type="button" data-close="finaleModal" aria-label="关闭">×</button>
-    <p class="finale-eyebrow" id="finaleEyebrow">当当当！</p>
-    <h2 id="finaleTitle"><span>L</span><span>O</span><span>V</span><span>E</span></h2>
-    <div class="finale-board"><canvas id="finaleBoard"></canvas></div>
-    <p class="finale-note" id="finaleNote"></p>
-    <div class="finale-actions">
-      <button class="btn ghost" type="button" id="btnSaveLove">保存这份 LOVE</button>
-      <button class="btn primary" type="button" id="btnReplay">再玩一次</button>
-    </div>
-  </div>
-</div>
-
-<noscript><p style="text-align:center;padding:40px 20px;font-family:sans-serif">这个游戏需要开启 JavaScript 才能运行。</p></noscript>
-
-<script src="assets/scoring.js"></script>
-<script src="assets/game.js"></script>
+<script src="assets/home.js"></script>
 </body>
 </html>

@@ -1,5 +1,5 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" role="img" aria-label="LOVE 函数拼字">
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" role="img" aria-label="070712 小站">
   <rect width="64" height="64" rx="15" fill="#fffafc"/>
   <path d="M32 52C32 52 9 38.5 9 24.5 9 17.6 14.3 12.5 21 12.5c4.2 0 8 2.1 11 5.9 3-3.8 6.8-5.9 11-5.9 6.7 0 12 5.1 12 12C55 38.5 32 52 32 52z" fill="#e11d48"/>
-  <path d="M21 40c1.6-2.6 4.3-2.6 5.4-.2" fill="none" stroke="#fffafc" stroke-width="2.4" stroke-linecap="round"/>
+  <circle cx="46" cy="18" r="4" fill="#f3a7b8"/>
 </svg>

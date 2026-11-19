@@ -1,6 +1,7 @@
 # 部署教程：GitHub Pages + 自己的域名
 
 这份教程对应**本仓库的真实配置**：域名 `070712zz.com`、仓库 `marker404/love-functions`。
+仓库根目录是小站首页，每个作品放在自己的子文件夹里（比如 `love-functions/` → `https://070712zz.com/love-functions/`）。
 全程免费，不需要服务器、数据库或后端。以后如果换域名或换仓库，把这三个名字对应替换即可。
 
 > 官方参考：GitHub 文档《[管理 GitHub Pages 网站的自定义域](https://docs.github.com/zh/pages/configuring-a-custom-domain-for-your-github-pages-site/managing-a-custom-domain-for-your-github-pages-site)》与《[用 HTTPS 保护 GitHub Pages](https://docs.github.com/zh/pages/getting-started-with-github-pages/securing-your-github-pages-site-with-https)》。
@@ -11,15 +12,45 @@
 
 | 项目 | 状态 |
 | --- | --- |
-| GitHub 仓库 `marker404/love-functions` | ✅ 已创建、已推送过一版 |
+| GitHub 仓库 `marker404/love-functions` | ✅ 已创建并上线 |
 | 仓库根目录 `CNAME` 文件 | ✅ 内容为 `070712zz.com` |
 | GitHub Pages（main / root） | ✅ 已开启 |
-| 自定义域名 | ✅ 已生效 |
-| HTTPS 证书 | ✅ 已签发，`https://070712zz.com` 能打开 |
-| **推送最新版本** | ⬜ 待办（本地还有新提交没推上去） |
-| **Enforce HTTPS** | ⬜ 待办（建议勾选） |
+| 自定义域名 + HTTPS | ✅ 已生效，`https://070712zz.com` 能打开 |
+| 首页 `/` | ✅ 小站首页（作品索引） |
+| 作品 `/love-functions/` | ✅ 已上线 |
+| 抱抱站 `/hug/` | ⬜ 规划中（见 `ROADMAP.md`） |
+| **Enforce HTTPS** | ⬜ 建议去 Pages 设置里勾选（见第 2.2 节） |
 
-所以现在只需要做两件事：**把新提交 push 上去**，然后在 Pages 设置里**勾选 Enforce HTTPS**（见第 2 节）。
+以后加了新作品，按第 1 节 `git push`，再在首页加一张卡片就行。
+
+---
+
+## 0.5 站点结构与 URL
+
+```
+/                       ← 首页：作品索引（仓库根目录的 index.html）
+├─ assets/              ← 首页自己的样式、脚本、图片
+├─ love-functions/      ← 作品 1：LOVE 函数拼字
+│  ├─ index.html
+│  ├─ assets/ ...
+│  └─ README.md
+├─ hug/                 ← 作品 2：抱抱小屋（规划中，做好了放进来）
+├─ CNAME                ← 自定义域名（070712zz.com）
+├─ .nojekyll            ← 让 GitHub Pages 跳过 Jekyll
+├─ DEPLOY.md            ← 本文件
+├─ ROADMAP.md           ← 规划和待办
+├─ README.md / LICENSE
+```
+
+| 地址 | 内容 |
+| --- | --- |
+| `https://070712zz.com/` | 小站首页 |
+| `https://070712zz.com/love-functions/` | LOVE 函数拼字 |
+| `https://070712zz.com/hug/` | 抱抱小屋（做好后放进来） |
+
+> 小提示：`070712zz.com/love-functions/` 是**路径（子目录）**，不是二级域名。
+> 二级域名是 `love.070712zz.com` 这种，每个功能都要单独加一条 DNS 记录；
+> 「一个域名 + 多个文件夹」的方式最省事，首页也能统一做索引。以后某个作品做大了想拆出去，再单独建仓库、加 `CNAME` 记录即可。
 
 ---
 
@@ -39,22 +70,26 @@ git push
 
 ---
 
-## 2. 这次要做的两件事
+## 2. 发布清单（每次更新过一遍）
 
-### 2.1 推送最新版本
+### 2.1 发布
 
 ```powershell
 cd "D:\Users\jetey\Desktop\建站\love-functions"
-git push -u origin main
+git add -A
+git commit -m "feat: 新增 xxx"
+git push
 ```
 
-推送完成后打开 <https://070712zz.com>，等一两分钟强刷，就能看到「反过来的正弦 E + 通关逐笔动画 + made of functions, deployed with love」。
+推送后等 1～2 分钟，强刷检查：
 
-### 2.2 勾选 Enforce HTTPS
+- 首页：<https://070712zz.com/>
+- 已上线的作品：<https://070712zz.com/love-functions/>
 
-1. 打开仓库 <https://github.com/marker404/love-functions> → **Settings**；
-2. 左侧 **Pages**；
-3. 找到 **Enforce HTTPS**，勾上（证书已经签发，这里应该可以直接勾）。
+### 2.2 Enforce HTTPS
+
+1. 打开仓库 <https://github.com/marker404/love-functions> → **Settings → Pages**；
+2. 勾选 **Enforce HTTPS**。
 
 勾上之后，`http://070712zz.com` 和 `http://www.070712zz.com` 都会自动跳到 `https://`。
 
@@ -92,9 +127,11 @@ git push -u origin main
 等 1～2 分钟，默认网址能打开：
 
 ```
-https://<你的用户名>.github.io/love-functions/
+https://<你的用户名>.github.io/love-functions/          ← 小站首页
+https://<你的用户名>.github.io/love-functions/love-functions/   ← 函数拼字（多一层文件夹）
 ```
 
+> 绑了自定义域名之后，就是 `https://070712zz.com/` 和 `https://070712zz.com/love-functions/`，干净很多。
 > 免费版把仓库改成 Private 后 Pages 会停止发布，网址会 404。
 
 ### 3.3 填自定义域名（先填，再配 DNS）
@@ -196,14 +233,16 @@ git push
 
 ## 5. 上线检查清单
 
-- [ ] 仓库是 Public，`main` 分支根目录有 `index.html`
-- [ ] Settings → Pages 已开启，默认网址能打开、能玩
+- [ ] 仓库是 Public，`main` 分支根目录有 `index.html`（首页）
+- [ ] Settings → Pages 已开启，默认网址能打开首页
+- [ ] 首页的作品卡片能点进 `/love-functions/`
 - [ ] Custom domain 填写正确，与 `CNAME` 文件内容一致
 - [ ] 根域名 `A` / `AAAA`、`www` 的 `CNAME` 都已配置，`Resolve-DnsName` 能查到
 - [ ] Pages 页面显示 DNS 配置成功
 - [ ] `Enforce HTTPS` 已勾选，`https://070712zz.com` 能打开
-- [ ] 手机浏览器竖屏能正常玩
-- [ ] 四关都能过，通关动画和「保存这份 LOVE」正常
+- [ ] 手机浏览器竖屏：首页、游戏都正常
+- [ ] 游戏四关能过，通关动画和「保存这份 LOVE」正常
+- [ ] 游戏左上角「← 小站首页」能回到 `/`
 
 ---
 
@@ -223,6 +262,9 @@ git push
 
 **Q：`Enforce HTTPS` 灰色 / 证书报错？**
 见 3.6。最常见原因是 DNS 还没指向 GitHub，或 Cloudflare 开了橙色代理。
+
+**Q：想加一个新作品，要改什么？**
+在仓库根目录新建一个文件夹（比如 `hug/`），里面放 `index.html` 和它自己的 `assets/`，所有资源用**相对路径**；然后在根目录 `index.html` 的 `.cards` 里加一张卡片、更新 `README.md` 的作品表，`git push` 即可。详细约定见 `README.md` 的「加一个新作品」。
 
 **Q：更新了代码，网站没变化？**
 等 1～2 分钟；`Ctrl + F5` 强刷；看 Actions 最近一次部署是否成功；绑了 Cloudflare 代理的话再清一下 Cloudflare 缓存。
