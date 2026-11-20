@@ -12,6 +12,7 @@
 | 作品 | 地址 | 状态 | 说明 |
 | --- | --- | --- | --- |
 | **LOVE · 函数拼字** | [/love-functions/](love-functions/) | 已上线 | 选函数、调参数，用反函数、圆、二次函数和竖起来的正弦拼出 LOVE |
+| **圣诞小屋** | [/xmas-cabin/](xmas-cabin/) | 已上线 | 线稿风小木屋，圣诞树、彩灯、雪人、礼物，能走进去逛 |
 | **抱抱小屋** | /hug/ | 筹备中 | 点一下，就有一个抱抱的页面 |
 | 保密 | /…/ | 空位 | 下一个小玩意 |
 
@@ -26,8 +27,10 @@
 │  ├─ home.css            ← 首页样式
 │  ├─ home.js             ← 首页交互（滚动淡入 + 首屏曲线动画）
 │  ├─ favicon.svg
-│  └─ preview-love.png    ← LOVE 卡片预览图
+│  ├─ preview-love.png    ← LOVE 卡片预览图
+│  └─ preview-xmas.jpg    ← 圣诞小屋卡片预览图
 ├─ love-functions/        ← 作品：LOVE 函数拼字（有自己的 README）
+├─ xmas-cabin/            ← 作品：圣诞小屋（取自 MIT 的线稿小屋，见 CREDITS.md）
 ├─ hug/                   ← 作品：抱抱小屋（规划中）
 ├─ CNAME                  ← 自定义域名 070712zz.com
 ├─ .nojekyll              ← 让 GitHub Pages 跳过 Jekyll
