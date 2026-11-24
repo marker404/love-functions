@@ -1,0 +1,24 @@
+{
+  "name": "a-christmas-wish",
+  "version": "1.0.0",
+  "description": "Three.js 实时手势交互粒子圣诞树，支持摄像头手势、照片上树、手势训练，完全离线可用",
+  "license": "MIT",
+  "private": false,
+  "scripts": {
+    "photos": "node scan-photos.js",
+    "start": "node scan-photos.js && node server.js",
+    "dev": "node scan-photos.js && node server.js"
+  },
+  "keywords": [
+    "threejs",
+    "mediapipe",
+    "webgl",
+    "christmas-tree",
+    "hand-gesture",
+    "particles",
+    "shader"
+  ],
+  "engines": {
+    "node": ">=16"
+  }
+}

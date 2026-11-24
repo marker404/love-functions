@@ -13,6 +13,7 @@
 | --- | --- | --- | --- |
 | **LOVE · 函数拼字** | [/love-functions/](love-functions/) | 已上线 | 选函数、调参数，用反函数、圆、二次函数和竖起来的正弦拼出 LOVE |
 | **圣诞小屋** | [/xmas-cabin/](xmas-cabin/) | 已上线 | 线稿风小木屋，圣诞树、彩灯、雪人、礼物，能走进去逛 |
+| **圣诞树 · 手势粒子** | [/christmas-tree/](christmas-tree/) | 已上线 | 摄像头手势操控的 28000 粒子圣诞树，照片能挂上树，完全离线可用 |
 | **抱抱小屋** | /hug/ | 筹备中 | 点一下，就有一个抱抱的页面 |
 | 保密 | /…/ | 空位 | 下一个小玩意 |
 
@@ -31,6 +32,7 @@
 │  └─ preview-xmas.jpg    ← 圣诞小屋卡片预览图
 ├─ love-functions/        ← 作品：LOVE 函数拼字（有自己的 README）
 ├─ xmas-cabin/            ← 作品：圣诞小屋（取自 MIT 的线稿小屋，见 CREDITS.md）
+├─ christmas-tree/        ← 作品：手势粒子圣诞树（Three.js + MediaPipe，依赖全部本地化）
 ├─ hug/                   ← 作品：抱抱小屋（规划中）
 ├─ CNAME                  ← 自定义域名 070712zz.com
 ├─ .nojekyll              ← 让 GitHub Pages 跳过 Jekyll
@@ -42,19 +44,15 @@
 
 ## 本地预览（我觉得你也不会哈哈哈，给想模仿的人看的）
 
-在**仓库根目录**起一个静态服务器（不是在子文件夹里）：
+在**仓库根目录**双击 `start.bat`（或运行 `node server.js`），它会起一个本地服务器并打开：
 
-```powershell
-cd "D:\Users\jetey\Desktop\建站\love-functions"
-python -m http.server 8000
-```
+- 首页：<http://127.0.0.1:8080/>
+- 函数拼字：<http://127.0.0.1:8080/love-functions/>
+- 圣诞树：<http://127.0.0.1:8080/christmas-tree/>
 
-然后打开：
+不想用 Node 也可以 `python -m http.server 8000`，效果一样。
 
-- 首页：<http://localhost:8000/>
-- 函数拼字：<http://localhost:8000/love-functions/>
-
-单个作品也可以直接双击它文件夹里的 `index.html` 打开。
+> 注意：圣诞树用了 ES Module + WASM，**必须通过 HTTP 打开**；直接双击 `index.html` 浏览器会拒绝加载模块。部署到 GitHub Pages 后走线上地址就没这个问题。
 
 ## 加一个新作品
 

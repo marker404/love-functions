@@ -1,0 +1,396 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<meta name="theme-color" content="#030b08">
+<title>A Christmas Wish · 圣诞的心愿</title>
+<link rel="stylesheet" href="./styles.css">
+
+<!-- Three.js 模块映射：全部指向本地 vendor，彻底摆脱 CDN，离线可用 -->
+<script type="importmap">
+{
+  "imports": {
+    "three": "./vendor/three/three.module.js",
+    "three/addons/controls/OrbitControls.js": "./vendor/three/OrbitControls.js",
+    "three/addons/environments/RoomEnvironment.js": "./vendor/three/RoomEnvironment.js"
+  }
+}
+</script>
+</head>
+<body>
+<noscript><div class="noscript">请开启 JavaScript 以点亮这棵树。</div></noscript>
+
+<main id="experience">
+
+  <!-- ============ 3D 场景 / 特效层 ============ -->
+  <canvas id="scene-canvas"></canvas>
+  <canvas id="trail-canvas"></canvas>
+  <div class="grain"></div>
+  <div class="vignette"></div>
+
+  <!-- ============ 顶栏 ============ -->
+  <header class="topbar">
+    <div class="masthead">
+      <div class="brand-mark" aria-hidden="true">
+        <svg viewBox="0 0 48 48" fill="none" stroke="currentColor" stroke-width="1.1">
+          <path d="M24 4l3.2 6.5 7.2 1-5.2 5.1 1.2 7.2L24 20.3 17.6 23.8l1.2-7.2-5.2-5.1 7.2-1L24 4z"/>
+          <circle cx="24" cy="34" r="2.4"/><circle cx="15" cy="40" r="2"/><circle cx="33" cy="40" r="2"/>
+          <path d="M24 36.4V42M17 38l-2 3M31 38l2 3" stroke-linecap="round"/>
+        </svg>
+      </div>
+      <div>
+        <div class="kicker"><span></span>Noël · 2026<span></span></div>
+        <h1>A Christmas <em>Wish</em></h1>
+        <div class="tagline">愿这一树星光，落进你的掌心</div>
+      </div>
+    </div>
+
+    <nav class="top-actions" aria-label="控制">
+      <a class="icon-btn icon-btn--wide home-link" href="../" title="回小站首页" aria-label="回小站首页">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M19 12H5M11 18l-6-6 6-6"/>
+        </svg>
+        <span>小站</span>
+      </a>
+      <span class="action-rule"></span>
+      <button class="icon-btn" id="fullscreen-btn" title="全屏" aria-label="全屏">
+        <svg class="icon-expand" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round">
+          <path d="M4 9V4h5M20 9V4h-5M4 15v5h5M20 15v5h-5"/>
+        </svg>
+        <svg class="icon-contract" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round">
+          <path d="M9 4v5H4M15 4v5h5M9 20v-5H4M15 20v-5h5"/>
+        </svg>
+      </button>
+      <span class="action-rule"></span>
+      <button class="icon-btn icon-btn--wide" id="memory-btn" title="回忆相册" aria-label="回忆相册">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+          <rect x="3" y="5" width="18" height="14" rx="2"/><circle cx="8.5" cy="10" r="1.5"/><path d="M4 17l5-4 3.5 3 3-2.5L20 17"/>
+        </svg>
+        <span>回忆</span>
+      </button>
+      <button class="icon-btn" id="camera-toggle" title="摄像头" aria-label="摄像头">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round">
+          <rect x="2.5" y="6.5" width="13" height="11" rx="2"/><path d="M15.5 10l6-3v10l-6-3z" stroke-linejoin="round"/>
+        </svg>
+      </button>
+      <span class="action-rule"></span>
+      <button class="icon-btn icon-btn--wide" id="trainer-btn" title="手势训练师" aria-label="手势训练师">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M12 3a3 3 0 00-3 3v5a3 3 0 006 0V6a3 3 0 00-3-3z"/><path d="M5 11a7 7 0 0014 0M12 18v3M9 21h6"/>
+        </svg>
+        <span>训练师</span>
+      </button>
+      <span class="action-rule"></span>
+      <button class="icon-btn icon-btn--wide" id="cinema-btn" title="净屏观赏：隐藏所有提示，只看星光" aria-label="净屏观赏">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M2.5 12s3.5-6.5 9.5-6.5 9.5 6.5 9.5 6.5-3.5 6.5-9.5 6.5S2.5 12 2.5 12z"/><circle cx="12" cy="12" r="2.6"/>
+        </svg>
+        <span>净屏观赏</span>
+      </button>
+    </nav>
+  </header>
+
+  <!-- ============ 手势状态提示 ============ -->
+  <div class="gesture-pill" id="gesture-pill">
+    <div class="gesture-pill__orb"><i></i></div>
+    <div class="gesture-pill__copy">
+      <div class="gesture-pill__title" id="gesture-title">等待手势</div>
+      <div class="gesture-pill__sub" id="gesture-sub">张开手掌，让树在光里舒展</div>
+    </div>
+    <div class="gesture-pill__meter"><i id="gesture-meter"></i></div>
+  </div>
+
+  <div class="move-hint">移动手掌，让光追随你的轨迹 ✦</div>
+
+  <!-- ============ 左侧题字牌（To: xxx） ============ -->
+  <div class="dedication" id="dedication">
+    <div class="dedication__corner dedication__corner--tl"></div>
+    <div class="dedication__corner dedication__corner--br"></div>
+    <div class="dedication__label">For you · 只为你</div>
+    <div class="dedication__row">
+      <span class="dedication__to">To</span>
+      <span class="dedication__colon">:</span>
+      <span class="dedication__name" id="dedication-name">Doki</span>
+    </div>
+    <div class="dedication__line"><span></span><i>✦</i><span></span></div>
+    <div class="dedication__foot" id="dedication-foot">Merry Christmas · 2026</div>
+    <button class="dedication__edit" id="dedication-edit" title="修改题字" aria-label="修改题字">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M12 20h9"/><path d="M16.5 3.5a2.12 2.12 0 013 3L7.5 18.5 3 20l1.5-4.5L16.5 3.5z"/>
+      </svg>
+    </button>
+  </div>
+
+  <!-- ============ 底部手势说明 ============ -->
+  <div class="gesture-dock" id="gesture-dock">
+    <div class="gesture-item" data-gesture="fist">
+      <span class="gesture-item__icon">
+        <svg viewBox="0 0 32 32" fill="none" stroke="currentColor" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M9 15V9.5a2 2 0 014 0V14M13 13V8a2 2 0 014 0v5M17 13V9.5a2 2 0 014 0V15M21 12.5a2 2 0 014 0V19c0 5-3.5 8-8.5 8h-2C10 27 7 24 7 19v-2l-2-1.5a2 2 0 012.6-3L9 14"/>
+        </svg>
+      </span>
+      <span class="gesture-item__copy"><b>握拳聚合</b><small>粒子收拢成树</small></span>
+    </div>
+    <div class="gesture-item" data-gesture="open">
+      <span class="gesture-item__icon">
+        <svg viewBox="0 0 32 32" fill="none" stroke="currentColor" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M9 17V8a2 2 0 014 0v7M13 15V6a2 2 0 014 0v9M17 15V7.5a2 2 0 014 0V16M21 14.5a2 2 0 014 0v5c0 5-3.5 7.5-8.5 7.5h-2C10 27 7 24.5 7 19.5V16l-2-1.5a2 2 0 012.6-3L9 13"/>
+        </svg>
+      </span>
+      <span class="gesture-item__copy"><b>张开散开</b><small>缩放 · 扩散</small></span>
+    </div>
+    <div class="gesture-item" data-gesture="spin">
+      <span class="gesture-item__icon">
+        <svg viewBox="0 0 32 32" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M26 13A11 11 0 107 24"/><path d="M26 6v7h-7"/>
+          <path d="M22 19a7 7 0 11-9-5"/>
+        </svg>
+      </span>
+      <span class="gesture-item__copy"><b>旋掌转动</b><small>顺逆时针转树</small></span>
+    </div>
+    <div class="gesture-item" data-gesture="ok">
+      <span class="gesture-item__icon">
+        <svg viewBox="0 0 32 32" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M12 20V7a2 2 0 014 0v13M18 20v-9a2 2 0 014 0v9"/>
+          <circle cx="9" cy="22" r="3"/><circle cx="23" cy="22" r="3"/>
+          <path d="M12 25h8"/>
+        </svg>
+      </span>
+      <span class="gesture-item__copy"><b>OK · 心愿</b><small>拇指食指成圈，星光四散，浮现一句心里话</small></span>
+    </div>
+  </div>
+
+  <!-- ============ 摄像头小窗 ============ -->
+  <aside class="camera-panel is-collapsed" id="camera-panel">
+    <div class="camera-panel__head">
+      <span><i class="live-dot"></i>LIVE · 手势捕捉</span>
+      <button id="camera-close" aria-label="收起摄像头">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"><path d="M6 6l12 12M18 6L6 18"/></svg>
+      </button>
+    </div>
+    <div class="video-wrap">
+      <video id="webcam" autoplay playsinline muted></video>
+      <canvas id="hand-overlay"></canvas>
+      <div class="video-placeholder" id="video-placeholder">
+        <span class="video-placeholder__ring"></span>
+        <span>等待画面</span>
+      </div>
+      <div class="video-tint"></div>
+      <div class="scanline"></div>
+    </div>
+    <div class="camera-panel__foot">
+      <span class="tracking-state"><i id="camera-tracking"></i>手部追踪</span>
+      <span class="hand-count" id="hand-count">0 / 2</span>
+    </div>
+  </aside>
+
+  <!-- ============ 回忆相册面板 ============ -->
+  <div class="panel-scrim" id="panel-scrim"></div>
+  <section class="memory-panel" id="memory-panel" aria-label="回忆相册">
+    <div class="memory-panel__head">
+      <div>
+        <div class="eyebrow">Your memories</div>
+        <h2>挂在树上的回忆</h2>
+      </div>
+      <button class="round-close" id="memory-close" aria-label="关闭">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><path d="M6 6l12 12M18 6L6 18"/></svg>
+      </button>
+    </div>
+
+    <div class="memory-panel__body">
+      <div class="dropzone" id="dropzone" tabindex="0">
+        <div class="dropzone__icon">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M12 16V4m0 0L8 8m4-4l4 4"/><path d="M4 15v3a2 2 0 002 2h12a2 2 0 002-2v-3"/>
+          </svg>
+        </div>
+        <b>把照片放上这棵树</b>
+        <span>点击选择 · 或将图片拖到这里（可多选，本次浏览有效）</span>
+        <input type="file" id="memory-file" accept="image/*" multiple hidden>
+      </div>
+
+      <div class="or-divider">或从文档插入</div>
+      <textarea id="memory-text" rows="3" placeholder="粘贴图片链接、data:image 地址或本地图片路径，每行 / 逗号分隔…"></textarea>
+      <button class="text-action" id="memory-add-text">插入到圣诞树 <span>↗</span></button>
+
+      <div class="memory-folder-note">想长期保存？把图片放进 <code>photos/</code> 文件夹，本地会自动扫描，部署前运行 <code>npm run photos</code>。</div>
+
+      <div class="memory-list-head">
+        <span>已收藏的瞬间</span>
+        <span><span id="memory-count">00</span> 张</span>
+      </div>
+      <div class="memory-list" id="memory-list"></div>
+    </div>
+
+    <div class="memory-panel__foot">每一张，都是我想和你重看的风景</div>
+  </section>
+
+  <!-- ============ 题字编辑弹窗 ============ -->
+  <div class="dedication-editor" id="dedication-editor" role="dialog" aria-modal="true" aria-label="修改题字">
+    <div class="dedication-editor__scrim" id="dedication-editor-scrim"></div>
+    <div class="dedication-editor__card">
+      <div class="dedication-editor__head">
+        <div>
+          <div class="eyebrow">Just for you</div>
+          <h2>写一句只给她的话</h2>
+        </div>
+        <button class="round-close" id="dedication-editor-close" aria-label="关闭">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><path d="M6 6l12 12M18 6L6 18"/></svg>
+        </button>
+      </div>
+      <div class="dedication-editor__body">
+        <label class="dedication-editor__label" for="dedication-input">称呼 / 名字</label>
+        <textarea id="dedication-input" rows="3" placeholder="例如：小雪、亲爱的、致我最爱的人…" spellcheck="false"></textarea>
+        <div class="dedication-editor__meta">
+          <span>支持中文 · 字数不限（过长会自动缩小，不会挡住圣诞树）</span>
+          <span id="dedication-count">0 字</span>
+        </div>
+        <div class="dedication-editor__preview">
+          <span class="dedication-editor__preview-label">效果预览</span>
+          <div class="dedication">
+            <div class="dedication__label">For you · 只为你</div>
+            <div class="dedication__row">
+              <span class="dedication__to">To</span><span class="dedication__colon">:</span>
+              <span class="dedication__name" id="dedication-preview-name">亲爱的</span>
+            </div>
+            <div class="dedication__line"><span></span><i>✦</i><span></span></div>
+            <div class="dedication__foot">Merry Christmas · 2026</div>
+          </div>
+        </div>
+      </div>
+      <div class="dedication-editor__foot">
+        <button class="text-action" id="dedication-editor-save">刻上这棵树 <span>↗</span></button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ============ 大图查看器 ============ -->
+  <div class="photo-viewer" id="photo-viewer">
+    <div class="photo-viewer__backdrop"></div>
+    <div class="photo-viewer__stage">
+      <div class="photo-viewer__halo"></div>
+      <div class="photo-viewer__orbit"><i></i><i></i><i></i></div>
+
+      <div class="photo-viewer__card" id="viewer-card">
+        <div class="photo-viewer__mat"><img id="focus-image" alt="回忆照片"></div>
+        <div class="photo-viewer__sheen"></div>
+        <span class="photo-viewer__corner photo-viewer__corner--tl"></span>
+        <span class="photo-viewer__corner photo-viewer__corner--tr"></span>
+        <span class="photo-viewer__corner photo-viewer__corner--bl"></span>
+        <span class="photo-viewer__corner photo-viewer__corner--br"></span>
+      </div>
+
+      <div class="photo-viewer__caption">
+        <p>A moment to keep</p>
+        <h2 id="viewer-title">圣诞回忆</h2>
+        <p id="viewer-desc">有些光，只想与你一起收藏。</p>
+      </div>
+    </div>
+    <div class="photo-viewer__hint"><span></span>回忆会自己收起 · 3 秒后回到星光里<span></span></div>
+    <button class="photo-viewer__close" id="viewer-close" aria-label="关闭">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><path d="M6 6l12 12M18 6L6 18"/></svg>
+    </button>
+  </div>
+
+  <!-- ============ OK 手势：中央随机文案 ============ -->
+  <div class="wish-quote" id="wish-quote" aria-live="polite">
+    <div class="wish-quote__ornament"><span></span><i>✦</i><span></span></div>
+    <p class="wish-quote__text" id="wish-quote-text"></p>
+    <div class="wish-quote__en" id="wish-quote-en"></div>
+  </div>
+
+  <!-- ============ Toast ============ -->
+  <div class="toast" id="toast"><span class="toast__star" id="toast-star">✦</span><span id="toast-text"></span></div>
+
+  <!-- ============ 首次进入引导卡（只显示一次，可关闭） ============ -->
+  <aside class="welcome-card" id="welcome-card" aria-label="新手引导">
+    <button class="welcome-card__close" id="welcome-close" aria-label="关闭引导">×</button>
+    <div class="welcome-card__eyebrow">✦ 欢迎来到这棵树</div>
+    <h2>几秒钟，学会点亮它</h2>
+    <div class="welcome-card__grid">
+      <div class="welcome-card__item"><b>✊ 握拳</b><span>粒子聚成树</span></div>
+      <div class="welcome-card__item"><b>🖐️ 张开</b><span>散开 · 缩放</span></div>
+      <div class="welcome-card__item"><b>🔄 旋掌</b><span>转动圣诞树</span></div>
+      <div class="welcome-card__item"><b>👌 OK</b><span>心愿文案</span></div>
+    </div>
+    <div class="welcome-card__tip">
+      <span class="welcome-card__tip-icon">◉</span>
+      <div><b>想安静看树？</b>点右上角「净屏观赏」，所有提示都会隐去，只留星光、照片与心愿。再点一次或按 P 返回。</div>
+    </div>
+    <div class="welcome-card__foot">照片放进 photos/ 文件夹就会自动挂上树 · 摄像头画面只在本机处理</div>
+  </aside>
+
+  <!-- ============ 净屏观赏：退出按钮（仅净屏态显示） ============ -->
+  <button class="cinema-exit" id="cinema-exit" title="退出净屏观赏" aria-label="退出净屏观赏">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><path d="M6 6l12 12M18 6L6 18"/></svg>
+    <span>退出观赏</span>
+  </button>
+
+  <!-- ============ 开场 ============ -->
+  <section class="intro" id="intro">
+    <div class="intro__shade"></div>
+    <div class="intro__content">
+      <div class="intro__ornament">
+        <span></span>
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.2"><path d="M12 2l2.2 4.5 5 .7-3.6 3.5.9 5L12 13.2 7.5 15.7l.9-5L4.8 7.2l5-.7L12 2z"/></svg>
+        <span></span>
+      </div>
+
+      <div class="intro__eyebrow kicker"><span></span>Merry Christmas<span></span></div>
+      <h1>
+        <span class="intro__zh">圣诞快乐</span>
+        <span class="intro__en">A Christmas Wish</span>
+      </h1>
+      <p class="intro__lead">用双手，把散落的光聚成一棵树。<br>把我们的回忆，一颗一颗挂上去。</p>
+
+      <div class="intro__actions">
+        <button class="btn btn--primary" id="start-camera">
+          <span class="btn__icon">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round"><rect x="2.5" y="6.5" width="13" height="11" rx="2"/><path d="M15.5 10l6-3v10l-6-3z"/></svg>
+          </span>
+          <span class="btn__copy"><b id="start-camera-label">开启摄像头</b><small>用手势点亮这棵树</small></span>
+          <span class="btn__arrow">→</span>
+        </button>
+        <button class="btn btn--ghost" id="start-demo">无摄像头漫游</button>
+      </div>
+
+      <div class="load-status" id="load-status"><i></i><span id="load-status-text">正在准备手势识别…</span></div>
+
+      <ul class="intro__legend">
+        <li><span class="legend-dot"></span>握拳 · 聚合成树</li>
+        <li><span class="legend-dot"></span>张开 · 散开缩放</li>
+        <li><span class="legend-dot"></span>旋掌 · 顺逆时针转动</li>
+        <li><span class="legend-dot"></span>OK 手势 · 星光四散，浮现心愿</li>
+      </ul>
+
+      <div class="intro__guide">
+        <span class="intro__guide-tag"> newcomers · 第一次来</span>
+        <p>进去后，右上角 <b>◉ 净屏观赏</b> 可一键收起所有提示，只留星光与照片；<b>回忆</b> 里翻看挂上树的照片（照片放在 photos/ 文件夹），<b>训练师</b> 可教它认得你的手势。</p>
+      </div>
+
+      <div class="privacy"><span>✦</span>左侧 <b style="color:var(--gold-bright);font-weight:400">To:</b> 题字可点右上角 ✎ 修改 · 摄像头画面仅在本机处理</div>
+    </div>
+
+    <div class="intro__coordinates">
+      <span>25° N · 121° E</span>
+      <span>MADE WITH LOVE · FOR YOU</span>
+    </div>
+    <div class="intro__scroll"><span></span>made a wish for you<span></span></div>
+  </section>
+
+</main>
+
+<script>
+  if (location.protocol === "file:") {
+    document.addEventListener("DOMContentLoaded", function () {
+      var tip = document.createElement("div");
+      tip.className = "file-warning";
+      tip.innerHTML = "这个页面需要 HTTP 才能运行（浏览器不允许 file:// 加载模块）。<br>在站点根目录双击 <b>start.bat</b>，或部署后访问 <b>/christmas-tree/</b>。";
+      document.body.appendChild(tip);
+    });
+  }
+</script>
+<script type="module" src="./app.js"></script>
+</body>
+</html>

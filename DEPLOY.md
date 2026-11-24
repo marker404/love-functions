@@ -34,6 +34,7 @@
 │  ├─ index.html
 │  ├─ assets/ ...
 │  └─ README.md
+├─ christmas-tree/      ← 作品：手势粒子圣诞树（Three.js + MediaPipe）
 ├─ hug/                 ← 作品 2：抱抱小屋（规划中，做好了放进来）
 ├─ CNAME                ← 自定义域名（070712zz.com）
 ├─ .nojekyll            ← 让 GitHub Pages 跳过 Jekyll
@@ -46,6 +47,7 @@
 | --- | --- |
 | `https://070712zz.com/` | 小站首页 |
 | `https://070712zz.com/love-functions/` | LOVE 函数拼字 |
+| `https://070712zz.com/christmas-tree/` | 圣诞树 · 手势粒子 |
 | `https://070712zz.com/hug/` | 抱抱小屋（做好后放进来） |
 
 > 小提示：`070712zz.com/love-functions/` 是**路径（子目录）**，不是二级域名。
